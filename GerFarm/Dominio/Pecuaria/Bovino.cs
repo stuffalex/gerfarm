@@ -3,15 +3,16 @@ using GerFarm.Dominio.Base;
 namespace GerFarm.Dominio.Pecuaria;
 public class Bovino : EntidadeBase<Bovino>
 {
-    public Enum Raca { get; protected set; }
+    public Enum Raca { get; private set; }
     public int Idade => CalculaIdade();
     public string IdadeDetalhada => CalculaIdadeDetalhada();
-    public DateTime DataDeNascimento { get; protected set; }
-    public decimal Peso { get; protected set; }
-    public string HistoricoDeSaude { get; protected set; }
-    public string Marca { get; protected set; }
+    public DateTime DataDeNascimento { get; private set; }
+    public decimal Peso { get; private set; }
+    public string HistoricoDeSaude { get; private set; }
+    public string Marca { get; private set; }
     public bool Marcado => Marca != null && Marca != "";
-    public bool Falecido { get; protected set; }
+    public bool Falecido { get; private set; }
+    public DateTime? DataDeFalecimento { get; private set; }
 
     public Bovino(Enum raca, DateTime dataDeNascimento, decimal peso, string historicoDeSaude, string marca)
     {
@@ -25,6 +26,7 @@ public class Bovino : EntidadeBase<Bovino>
     public void RegistrarFalecimento()
     {
         Falecido = true;
+        DataDeFalecimento = DateTime.Now;
     }
 
     private int CalculaIdade()
