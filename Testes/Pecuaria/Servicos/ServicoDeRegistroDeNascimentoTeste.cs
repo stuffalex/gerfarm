@@ -12,6 +12,7 @@ namespace Testes.Pecuaria.Servicos
         private string _historicoDeSaude;
         private string _marca;
         private IServicoDeRegistroDeNascimento _servico;
+        private Bovino _mae;
 
         [SetUp]
         public void Setup()
@@ -21,22 +22,52 @@ namespace Testes.Pecuaria.Servicos
             _historicoDeSaude = "lorem ipsum, saudável";
             _marca = "G";
             _dataDeNascimento = DateTime.Today;
-            _servico = new ServicoDeRegistroDeNascimento();
+            _servico = new ServicoDeRegistroDeNascimento(); 
+            _mae = BovinoBuilder.UmBovino().Build();
         }
 
         [Test]
-        public void DeveCriarUmBovino()
+        public void DeveRegistrarOFilhote()
         {
-            var bovino = _servico.Registrar(_raca, _peso, _historicoDeSaude, _marca);
+            var filhote = _servico.RegistrarFilho(_mae, _raca, _peso, _historicoDeSaude, _marca);
 
             Assert.Multiple(() =>
             {
-                Assert.That(bovino.Raca, Is.EqualTo(_raca), "A raça do bovino está incorreta.");
-                Assert.That(bovino.Peso, Is.EqualTo(_peso), "O peso do bovino está incorreto.");
-                Assert.That(bovino.HistoricoDeSaude, Is.EqualTo(_historicoDeSaude), "O histórico de saúde do bovino está incorreto.");
-                Assert.That(bovino.Marca, Is.EqualTo(_marca), "A marca do bovino está incorreta.");
-                Assert.That(bovino.DataDeNascimento, Is.EqualTo(_dataDeNascimento), "A data de nascimento do bovino está incorreta.");
+                Assert.That(filhote, Is.Not.Null);
+                Assert.That(filhote.Mae, Is.EqualTo(_mae));
+                Assert.That(_mae.Filhos, Contains.Item(filhote));
             });
+        }
+
+        [Test]
+        public void DeveEstabelecerRelacaoMaeFilhoCorretamente()
+        {
+            var mae = new Bovino(Raca.Angus, DateTime.Today.AddYears(-5), 600, "Saudável", "M1");
+            
+            var filhote = _servico.Registrar(mae, Raca.Angus, 35, "Saudável", "F1");
+            
+            Assert.Multiple(() =>
+            {
+                Assert.That(filhote.Mae, Is.EqualTo(mae));
+                Assert.That(mae.Filhos, Contains.Item(filhote));
+                Assert.That(mae.EhMae, Is.True);
+            });
+        }
+
+        [Test]
+        public void DeveLancarExcecaoQuandoMaeEhNula()
+        {
+            var ex = Assert.Throws<ValidacaoDeDominio>(() => _servico.Registrar(null, _raca, _peso, _historicoDeSaude, _marca));
+            
+            Assert.That(ex.Message, Is.EqualTo("Mãe não pode ser vazio ou nulo."));
+        }
+
+        [Test]
+        public void DeveDefinirDataDeNascimentoComoDataAtual()
+        {
+            var filhote = _servico.Registrar(_mae, _raca, _peso, _historicoDeSaude, _marca);
+
+            Assert.That(filhote.DataDeNascimento, Is.EqualTo(DateTime.Today));
         }
     }
 }

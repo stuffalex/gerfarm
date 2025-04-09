@@ -120,4 +120,40 @@ public class BovinoTeste
 
         Assert.That(idade, Is.EqualTo(bovino.IdadeDetalhada));
     }
+
+    [Test]
+    public void DeveRetornarTrueQuandoTemFilhos(){
+        var mae = new Bovino(_raca, _dataDeNascimento, _peso, _historicoDeSaude, _marca);
+        var filhote = new Bovino(_raca, DateTime.Today, 30m, "Saudável", "F1");
+
+        mae.RegistrarFilho(filhote);
+
+        Assert.That(mae.EhMae, Is.True);
+    }
+
+    [Test]
+    public void DeveRetornarFalseQuandoNaoTemFilhos(){
+        var mae = new Bovino(_raca, _dataDeNascimento, _peso, _historicoDeSaude, _marca);
+
+        Assert.That(mae.EhMae, Is.True);
+    }
+
+    [Test]
+    public void NaoDeveAdicionarFilhoDuplicado(){
+        var mae = new Bovino(_raca, _dataDeNascimento, _peso, _historicoDeSaude, _marca);
+        var filhote = new Bovino(_raca, DateTime.Today, 30m, "Saudável", "F1");
+
+        mae.RegistrarFilho(filhote);
+        mae.RegistrarFilho(filhote);
+
+        Assert.That(mae.Filhos.Count, Is.EqualTo(1));
+    }
+
+    [Test]
+    public void DeveLancarExcecaoQuandoFilhoEhNulo()
+    {
+        var mae = new Bovino(_raca, _dataDeNascimento, _peso, _historicoDeSaude, _marca);
+
+        Assert.Throws<ArgumentNullException>(() => mae.RegistrarFilho(null));
+    }
 }

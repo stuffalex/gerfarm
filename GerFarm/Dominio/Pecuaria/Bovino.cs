@@ -13,6 +13,9 @@ public class Bovino : EntidadeBase<Bovino>
     public bool Marcado => Marca != null && Marca != "";
     public bool Falecido { get; private set; }
     public DateTime? DataDeFalecimento { get; private set; }
+    public List<Bovino> Filhos { get; private set; } = new List<Bovino>();
+    public bool EhMae => Filhos.Count > 0;
+    public Bovino? Mae { get; private set; }
 
     public Bovino(Enum raca, DateTime dataDeNascimento, decimal peso, string historicoDeSaude, string marca)
     {
@@ -34,7 +37,7 @@ public class Bovino : EntidadeBase<Bovino>
         var hoje = DateTime.Today;
         var idade = hoje.Year - DataDeNascimento.Year;
 
-        // Ajusta a idade se a pessoa ainda não fez aniversário no ano atual.
+        // Ajusta a idade se a pessoa ainda nï¿½o fez aniversï¿½rio no ano atual.
         if (DataDeNascimento.Date > hoje.AddYears(-idade))
         {
             idade--;
@@ -47,19 +50,19 @@ public class Bovino : EntidadeBase<Bovino>
     {
         var hoje = DateTime.Today;
 
-        // Calcula a diferença de anos, meses e dias
+        // Calcula a diferenï¿½a de anos, meses e dias
         int anos = hoje.Year - DataDeNascimento.Year;
         int meses = hoje.Month - DataDeNascimento.Month;
         int dias = hoje.Day - DataDeNascimento.Day;
 
-        // Ajusta os meses se necessário
+        // Ajusta os meses se necessï¿½rio
         if (meses < 0)
         {
             anos--;
             meses += 12;
         }
 
-        // Ajusta os dias se necessário
+        // Ajusta os dias se necessï¿½rio
         if (dias < 0)
         {
             meses--;
@@ -67,5 +70,19 @@ public class Bovino : EntidadeBase<Bovino>
         }
 
         return $"{anos} ano(s), {meses} mes(es) e {dias} dia(s)";
+    }
+
+    public void RegistrarFilho(Bovino filhote){
+        ValidacaoDeDominio.Quando(filhote == null, "Filhote nÃ£o pode ser vazio ou nulo.");
+
+        if(!Filhos.Contains(filhote)){
+            Filhos.add(filhote);
+            filhote.DefinirMae(this);
+        }
+    }
+
+    private void DefinirMae(Bovino mae)
+    {
+        this.Mae = mae;
     }
 }
