@@ -2,6 +2,6 @@
 {
     public interface IServicoDeRegistroDeNascimento
     {
-        public Bovino Registrar(Enum raca, decimal peso, string historicoDeSaude, string marca);
+        public Bovino Registrar(Bovino mae, Enum raca, decimal peso, string historicoDeSaude, string marca);
     }
 }
